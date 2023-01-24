@@ -1,8 +1,8 @@
 const graphql = require("graphql");
-// const Staff = require("../model/staff");
-// const Task = require("../model/task");
+const Staff = require("../model/Staff");
+const Task = require("../model/Task");
 
-const  {Staff, Task } = require("./testData")
+// const  {Staff, Task } = require("./testData")
 
 
 const { 
@@ -37,7 +37,7 @@ const TaskType = new GraphQLObjectType({
         staff: {
             type: StaffType,
             resolve(parent, args){
-                return Staff.find(staff => staff.id === parent.id)
+                return Staff.findById(parent.clientID)
             }
         }
     })  
@@ -53,26 +53,26 @@ const RootQuery = new GraphQLObjectType({
             type: StaffType,
             args: {id : {type: GraphQLID}},
             resolve(parent, args) {
-                return Staff.find(staff => staff.id === args.id)
+                return Staff.findById(args.id)
             }
         },
         staffs: {
             type: new GraphQLList(StaffType),
             resolve(parent, args) {
-                return Staff
+                return Staff.find({})
             }
         },
         task: {
             type: TaskType,
             args: {id : {type: GraphQLID}},
             resolve(parent, args) {   
-                return Task.find(task => task.id === args.id)
+                return Task.findById(args.id)
             }
         },
         tasks: {
             type: new GraphQLList(TaskType),
             resolve(parent, args) {
-                return Task
+                return Task.find({})
             }
         }
     }
