@@ -1,16 +1,19 @@
 const graphql = require("graphql");
-const Staff = require("../model/staff");
-const Task = require("../model/task");
+// const Staff = require("../model/staff");
+// const Task = require("../model/task");
+
+const  {Staff, Task } = require("./testData")
+
 
 const { 
     GraphQLObjectType,
     GraphQLString, 
     GraphQLID,
     GraphQLList,
-    GraphQLInt
+    GraphQLInt 
 } = graphql;
 
-
+   
 
 // GraphQL Schemas
 const StaffType = new GraphQLObjectType({
@@ -21,15 +24,24 @@ const StaffType = new GraphQLObjectType({
         email: {type: GraphQLString},
         phone: {type: GraphQLString}
     })
-})
+});
 
 
 const TaskType = new GraphQLObjectType({
-    name: "Taks",
+    name: "Task",
     fields: () => ({
-
-    })
-})
+        id: {type: GraphQLString},
+        name: {type: GraphQLString},
+        description: {type: GraphQLString},
+        status: {type: GraphQLString},
+        staff: {
+            type: StaffType,
+            resolve(parent, args){
+                return Staff.find(staff => staff.id === parent.id)
+            }
+        }
+    })  
+});
 
 
 
@@ -43,10 +55,34 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args) {
                 return Staff.find(staff => staff.id === args.id)
             }
+        },
+        staffs: {
+            type: new GraphQLList(StaffType),
+            resolve(parent, args) {
+                return Staff
+            }
+        },
+        task: {
+            type: TaskType,
+            args: {id : {type: GraphQLID}},
+            resolve(parent, args) {   
+                return Task.find(task => task.id === args.id)
+            }
+        },
+        tasks: {
+            type: new GraphQLList(TaskType),
+            resolve(parent, args) {
+                return Task
+            }
         }
     }
 });
 
+
+
+
+
+console.log(Task);
 
 module.exports = new graphql.GraphQLSchema({
     query: RootQuery

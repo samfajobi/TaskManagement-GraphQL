@@ -7,7 +7,7 @@ const schema = require("./schema/schema");
 
 const app = express();
 
-let URL = "mongodb+srv://Christsam:SamFajobi99@cluster0.otx0rri.mongodb.net/?retryWrites=true&w=majority"
+let URL = "mongodb+srv://Christsam:SamFajobi99@cluster0.9vutphb.mongodb.net/?retryWrites=true&w=majority"
 mongoose.set("strictQuery", false);
 mongoose.connect(URL);
 

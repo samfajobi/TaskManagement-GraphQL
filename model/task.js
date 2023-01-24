@@ -4,8 +4,11 @@ const Schema = mongoose.Schema
 
 
 const taskSchema = new Schema({
-    name: String,
-    status: String,
+    name: {type: String},
+    description: {type: String},
+    status: {type: String,  enum: ["Not Started", "In Progress", "Completed"]},
+    staffId: {type: mongoose.}
 })
+
 
 module.exports = mongoose.model("Task", taskSchema);
