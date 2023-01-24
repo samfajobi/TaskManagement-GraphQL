@@ -102,9 +102,31 @@ const Mutation = new GraphQLObjectType({
                 })
                 return staff.save();
             }
+        },
+        deleteStaff: {
+            type: StaffType,
+            resolve(parent, args){
+
+            }
+        },
+        addTask: {
+            type: TaskType,
+            args: {
+                name: {type: new GraphQLNonNull(GraphQLString)},
+                description: {type:  new GraphQLNonNull(GraphQLString)},
+                status: {type: new GraphQLNonNull(GraphQLString)}
+            },
+            resolve(parent, args){
+                let task = new Task({
+                    name: args.name,
+                    description: args.description,
+                    status: args.status
+                })
+                return task.save();
+            }
         }
     }
-})
+});
 
 
 
