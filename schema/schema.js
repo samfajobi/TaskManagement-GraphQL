@@ -10,7 +10,8 @@ const {
     GraphQLString, 
     GraphQLID,
     GraphQLList,
-    GraphQLInt 
+    GraphQLInt,
+    GraphQLNonNull 
 } = graphql;
 
    
@@ -22,8 +23,9 @@ const StaffType = new GraphQLObjectType({
         id: {type: GraphQLID},
         name: {type: GraphQLString},
         email: {type: GraphQLString},
-        phone: {type: GraphQLString}
-    })
+        phone: {type: GraphQLString},
+        age: {type: GraphQLInt}
+    })  
 });
 
 
@@ -66,8 +68,8 @@ const RootQuery = new GraphQLObjectType({
             type: TaskType,
             args: {id : {type: GraphQLID}},
             resolve(parent, args) {   
-                return Task.findById(args.id)
-            }
+                return Task.findById(args.id) 
+            }  
         },
         tasks: {
             type: new GraphQLList(TaskType),
@@ -80,10 +82,37 @@ const RootQuery = new GraphQLObjectType({
 
 
 
+const Mutation = new GraphQLObjectType({
+    name: "Mutation",
+    fields: {
+        addStaff: {
+            type: StaffType,
+            args: {
+                name: {type: new GraphQLNonNull(GraphQLString)},
+                age: {type: new GraphQLNonNull(GraphQLInt)},
+                email: {type: new GraphQLNonNull(GraphQLString)},
+                phone: {type: new GraphQLNonNull(GraphQLString)}
+            },
+            resolve(parent, args){
+                let staff = new Staff({
+                    name: args.name,
+                    age: args.age,
+                    email: args.email,
+                    phone: args.phone
+                })
+                return staff.save();
+            }
+        }
+    }
+})
+
+
+
 
 
 console.log(Task);
 
 module.exports = new graphql.GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: Mutation
 });
