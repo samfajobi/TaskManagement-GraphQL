@@ -11,7 +11,8 @@ const {
     GraphQLID,
     GraphQLList,
     GraphQLInt,
-    GraphQLNonNull 
+    GraphQLNonNull,
+    GraphQLEnumType 
 } = graphql;
 
    
@@ -39,7 +40,7 @@ const TaskType = new GraphQLObjectType({
         staff: {
             type: StaffType,
             resolve(parent, args){
-                return Staff.findById(parent.clientID)
+                return Staff.findById(parent.staffId)
             }
         }
     })  
@@ -103,27 +104,83 @@ const Mutation = new GraphQLObjectType({
                 return staff.save();
             }
         },
+
         deleteStaff: {
             type: StaffType,
+            args: {id: {type: new GraphQLNonNull(GraphQLID)}},
             resolve(parent, args){
-
+                return Staff.findByIdAndDelete(args.id)
             }
         },
+         
         addTask: {
             type: TaskType,
             args: {
                 name: {type: new GraphQLNonNull(GraphQLString)},
                 description: {type:  new GraphQLNonNull(GraphQLString)},
-                status: {type: new GraphQLNonNull(GraphQLString)}
+                status: {
+                    type: new GraphQLEnumType({
+                        name: "TaskStatus",
+                        values: {
+                            "new": {value: "Not Started"},
+                            "progress": {value: "In Progress"},
+                            "completed": {value: "Completed"}
+                        }
+                   }),
+                   default: "Not Started"
+                },
+                staffId: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
                 let task = new Task({
                     name: args.name,
                     description: args.description,
-                    status: args.status
+                    status: args.status,
+                    staffId: args.staffId
                 })
                 return task.save();
             }
+        },
+        deleteTask: {
+            type: TaskType,
+            args: { id: {type: GraphQLID}},
+            resolve(parent, args){
+                return Task.findByIdAndDelete(args.id)
+            }
+        },
+
+        updateTask: {
+            type: TaskType,
+            args: {
+                id: {type: GraphQLID},
+                name: {type: GraphQLString},
+                description: {type: GraphQLString},
+                status: {
+                    type: new GraphQLEnumType({
+                        name: "TaskStatusUpdate",
+                        values: {
+                            "new": {value: "Not Started"},
+                            "progress": {value: "In Progress"},
+                            "completed": {value: "Completed"}
+                        }
+                   }),
+                   default: "Not Started"
+                },
+            },
+            resolve(parent, args){
+                return Task.findByIdAndUpdate(
+                    args.id,
+                    {
+                        $set: {
+                            name: args.name,
+                            description: args.description,
+                            status: args.status
+                        }
+                    },
+                    {new: true}
+                )
+            }
+
         }
     }
 });
